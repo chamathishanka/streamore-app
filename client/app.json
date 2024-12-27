@@ -1,0 +1,55 @@
+{
+  "expo": {
+    "name": "streamore",
+    "slug": "streamore",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.chamathishankaorg.streamore"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.chamathishankaorg.streamore"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9397c6f8-0b1a-4b04-bf3d-4922976a9017"
+      }
+    },
+    "owner": "chamathishanka-org",
+    "updates": {
+      "url": "https://u.expo.dev/9397c6f8-0b1a-4b04-bf3d-4922976a9017"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
+  }
+}
