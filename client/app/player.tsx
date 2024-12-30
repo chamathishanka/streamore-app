@@ -1,32 +1,54 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Image, Text } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Image, Text, Alert, Linking } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Dimensions } from 'react-native';
-
+import axios from 'axios';
 
 const { height, width } = Dimensions.get('window');
-
 
 export default function Player() {
     const [sound, setSound] = useState<Audio.Sound | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [position, setPosition] = useState(0);
     const [duration, setDuration] = useState(0);
+    const [track, setTrack] = useState<any>(null);
 
+    useEffect(() => {
+        const fetchTrack = async () => {
+            try {
+                const response = await axios.get('https://api.deezer.com/track/2992749261');
+                setTrack(response.data);
+            } catch (error) {
+                console.error('Error fetching track:', error);
+                Alert.alert('Error', 'Error fetching track data');
+            }
+        };
 
+        fetchTrack();
+    }, []);
+
+    useEffect(() => {
+        if (track && track.preview) {
+            playSound();
+        }
+    }, [track]);
 
     async function playSound() {
-        console.log('Loading Sound');
-        const { sound } = await Audio.Sound.createAsync(require('../assets/metro.mp3')); // Correct relative path to your audio file
-        setSound(sound);
+        if (track && track.preview) {
+            console.log('Loading Sound');
+            const { sound } = await Audio.Sound.createAsync({ uri: track.preview });
+            setSound(sound);
 
-        sound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
+            sound.setOnPlaybackStatusUpdate(onPlaybackStatusUpdate);
 
-        console.log('Playing Sound');
-        await sound.playAsync();
-        setIsPlaying(true);
+            console.log('Playing Sound');
+            await sound.playAsync();
+            setIsPlaying(true);
+        } else {
+            Alert.alert('Error', 'No preview URL available for this track');
+        }
     }
 
     function onPlaybackStatusUpdate(status: AVPlaybackStatus) {
@@ -50,16 +72,6 @@ export default function Player() {
         }
     }
 
-    async function playNext() {
-        // Implement play next functionality
-        console.log('Next track');
-    }
-
-    async function playPrev() {
-        // Implement play previous functionality
-        console.log('Previous track');
-    }
-
     useEffect(() => {
         return sound
             ? () => {
@@ -69,15 +81,25 @@ export default function Player() {
             : undefined;
     }, [sound]);
 
+    if (!track) {
+        return (
+            <View style={styles.container}>
+                <Text style={styles.loadingText}>Loading...</Text>
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
             <Image
-                source={require('../assets/images/icon.png')} // Correct relative path to your cover art image
+                source={{ uri: track.album.cover_big }}
                 style={styles.coverArt}
             />
             <View style={styles.textContainer}>
-                <Text style={styles.songName}>Song Name</Text>
-                <Text style={styles.artistName}>Artist Name</Text>
+                <Text style={styles.songName}>{track.title}</Text>
+                <TouchableOpacity onPress={() => Linking.openURL(track.artist.link)}>
+                    <Text style={styles.artistName}>{track.artist.name}</Text>
+                </TouchableOpacity>
             </View>
             <Slider
                 style={styles.slider}
@@ -101,8 +123,6 @@ export default function Player() {
         </View>
     );
 }
-
-
 
 const styles = StyleSheet.create({
     container: {
@@ -155,5 +175,9 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    loadingText: {
+        color: 'white',
+        fontSize: 18,
     },
 });
