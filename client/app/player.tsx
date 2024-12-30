@@ -6,6 +6,8 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Dimensions } from 'react-native';
 
 
+const { height, width } = Dimensions.get('window');
+
 
 export default function Player() {
     const [sound, setSound] = useState<Audio.Sound | null>(null);
@@ -88,20 +90,20 @@ export default function Player() {
                 thumbTintColor="white"
             />
             <View style={styles.controls}>
-                <Icon style={{ marginLeft: 30 }} name="backward" size={30} color="white" />
+                <Icon style={{ marginLeft: width * 0.05 }} name="backward" size={30} color="white" />
 
                 <TouchableOpacity style={styles.playPauseButton} onPress={togglePlayPause}>
                     <Icon name={isPlaying ? 'pause' : 'play'} size={30} color="#0a0a1a" />
                 </TouchableOpacity>
 
-                <Icon style={{ marginRight: 30 }} name="forward" size={30} color="white" />
+                <Icon style={{ marginRight: width * 0.05 }} name="forward" size={30} color="white" />
             </View>
         </View>
     );
 }
 
 
-const { height, width } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
