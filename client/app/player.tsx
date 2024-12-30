@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Image, Text } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { Dimensions } from 'react-native';
+
+
 
 export default function Player() {
     const [sound, setSound] = useState<Audio.Sound | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [position, setPosition] = useState(0);
     const [duration, setDuration] = useState(0);
+
+
 
     async function playSound() {
         console.log('Loading Sound');
@@ -64,6 +69,14 @@ export default function Player() {
 
     return (
         <View style={styles.container}>
+            <Image
+                source={require('../assets/images/icon.png')} // Correct relative path to your cover art image
+                style={styles.coverArt}
+            />
+            <View style={styles.textContainer}>
+                <Text style={styles.songName}>Song Name</Text>
+                <Text style={styles.artistName}>Artist Name</Text>
+            </View>
             <Slider
                 style={styles.slider}
                 minimumValue={0}
@@ -87,6 +100,8 @@ export default function Player() {
     );
 }
 
+
+const { height, width } = Dimensions.get('window');
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -94,6 +109,30 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#0a0a1a',
         padding: 20,
+    },
+    coverArt: {
+        width: width * 0.86,
+        height: width * 0.86,
+        marginBottom: height * 0.12,
+        borderRadius: 10,
+    },
+    textContainer: {
+        width: '100%',
+        alignItems: 'flex-start', // Align text to the left
+        marginLeft: width * 0.07,
+        marginBottom: 15,
+    },
+    songName: {
+        fontSize: 24,
+        color: 'white',
+        textAlign: 'right',
+        marginBottom: 5,
+        fontWeight: 'bold',
+    },
+    artistName: {
+        fontSize: 18,
+        color: '#888',
+        marginBottom: 20,
     },
     slider: {
         width: '100%',
