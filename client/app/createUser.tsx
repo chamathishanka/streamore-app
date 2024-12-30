@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Text, View, StyleSheet, TextInput, TouchableOpacity } from "react-native";
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, Alert, SafeAreaView } from "react-native";
+import axios from 'axios';
 
 export default function CreateUser() {
     const [username, setUsername] = useState('');
@@ -7,16 +8,30 @@ export default function CreateUser() {
     const [name, setName] = useState('');
     const [dob, setDob] = useState('');
 
-    const handleCreateAccount = () => {
-        // Handle create account logic here
-        console.log('Contact:', username);
+    const handleCreateAccount = async () => {
+
+        // Log the data to check if it's being captured correctly
+        console.log('Username:', username);
         console.log('Password:', password);
         console.log('Name:', name);
         console.log('DOB:', dob);
+        try {
+            const response = await axios.post('http://192.168.244.21:3000/api/users/create', {
+                username,
+                password,
+                name,
+                dob,
+            });
+            if (response.status === 201) {
+                Alert.alert('Success', 'User created successfully');
+            }
+        } catch (error) {
+            Alert.alert('Error', 'Error creating user: ' + (error as any).message);
+        }
     };
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Let's Connect with Us!</Text>
             <Text style={styles.subtitle}>Tune in to your favorite music and more.</Text>
             <TextInput
@@ -51,7 +66,7 @@ export default function CreateUser() {
             <TouchableOpacity style={styles.button} onPress={handleCreateAccount}>
                 <Text style={styles.buttonText}>Create Account</Text>
             </TouchableOpacity>
-        </View>
+        </SafeAreaView>
     );
 }
 

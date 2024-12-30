@@ -4,12 +4,16 @@ import bcrypt from 'bcrypt';
 // Function to create a new user
 export const createUser = async (req, res) => {
     const { username, password, name, dob } = req.body;
+    console.log('Received data:', { username, password, name, dob }); // Log received data
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
+        console.log('Hashed password:', hashedPassword); // Log hashed password
         const newUser = new User({ username, password: hashedPassword, name, dob });
         await newUser.save();
+        console.log('New user created:', newUser); // Log new user
         res.status(201).send('User created successfully');
     } catch (err) {
+        console.error('Error creating user:', err.message); // Log error
         res.status(500).send('Error creating user: ' + err.message);
     }
 };

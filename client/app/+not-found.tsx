@@ -1,12 +1,12 @@
 import { Link } from "expo-router";
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, SafeAreaView } from "react-native";
 
 export default function Index() {
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Text style={styles.text}>404 Not Found</Text>
             <Link href={"/"} style={styles.button}> Home </Link>
-        </View>
+        </SafeAreaView>
     );
 }
 

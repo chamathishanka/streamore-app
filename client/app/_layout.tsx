@@ -14,6 +14,15 @@ export default function RootLayout() {
             headerStyle: { backgroundColor: "#0a0a1a" },
             headerLeft: () => null,
           }} />
+
+        <Stack.Screen name="login"
+          options={{
+            headerTitle: "StreaMore",
+            headerTintColor: "white",
+            headerStyle: { backgroundColor: "#0a0a1a" },
+            headerLeft: () => <></>,
+          }} />
+
         <Stack.Screen name="createUser"
           options={{
             headerTitle: "",
@@ -23,7 +32,24 @@ export default function RootLayout() {
               <Text style={{ color: 'white', marginRight: 10 }}>Create Account</Text>
             ),
           }} />
+
+        <Stack.Screen name="home"
+          options={{
+            headerTitle: "StreaMore",
+            headerTintColor: "white",
+            headerStyle: { backgroundColor: "#0a0a1a" },
+            headerLeft: () => <></>,
+          }} />
+
+        <Stack.Screen name="player"
+          options={{
+            headerTitle: "Music Player",
+            headerTintColor: "white",
+            headerStyle: { backgroundColor: "#0a0a1a" },
+          }} />
       </Stack>
+
+
     </>
   );
 }
