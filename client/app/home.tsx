@@ -5,6 +5,9 @@ import { Dimensions } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import { router } from "expo-router";
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../state/store';
+import { increment } from '../state/slices/clickSlice';
 import PlaylistCard from "@/components/PlaylistCard";
 import ArtistCard from '../components/ArtistCard';
 import SingleCard from '../components/SingleCard';
@@ -44,6 +47,8 @@ export default function Home() {
     const [topSingles, setTopSingles] = useState<TrackData[]>([]);
     const [loading, setLoading] = useState(true); // Loading state
     const navigation = useNavigation();
+    const dispatch = useDispatch();
+    const clickCount = useSelector((state: RootState) => state.click.count);
 
     useEffect(() => {
         SystemUI.setBackgroundColorAsync('#0a0a1a');
@@ -126,6 +131,7 @@ export default function Home() {
     };
 
     const handleCardPress = () => {
+        dispatch(increment());
         Alert.alert('Card Pressed', 'You pressed the card!');
         // You can navigate to another screen or perform any other action here
     };
@@ -159,7 +165,7 @@ export default function Home() {
                 <Text style={styles.heading}>Top Artists</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.artistsScrollView}>
                     {artists.map(artist => (
-                        <ArtistCard key={artist.id} artist={artist} />
+                        <ArtistCard key={artist.id} artist={artist} onPress={handleCardPress} />
                     ))}
                 </ScrollView>
 
@@ -177,10 +183,13 @@ export default function Home() {
                 <Text style={styles.heading}>Top Singles</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.singlesScrollView}>
                     {topSingles.map(single => (
-                        <SingleCard key={single.id} single={single} />
+                        <SingleCard key={single.id} single={single} onPress={handleCardPress} />
                     ))}
                 </ScrollView>
             </ScrollView>
+            <TouchableOpacity style={styles.floatingButton} onPress={() => Alert.alert('Click Count', `Items clicked ${clickCount} times`)}>
+                <Text style={styles.floatingButtonText}>{clickCount}</Text>
+            </TouchableOpacity>
         </SafeAreaView>
     );
 }
@@ -235,5 +244,21 @@ const styles = StyleSheet.create({
     singlesScrollView: {
         paddingVertical: 10,
         paddingHorizontal: 5,
+    },
+    floatingButton: {
+        position: 'absolute',
+        bottom: 30,
+        right: 30,
+        backgroundColor: '#8df807',
+        borderRadius: 50,
+        width: 60,
+        height: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    floatingButtonText: {
+        color: 'black',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });

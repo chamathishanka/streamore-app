@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 
 interface ArtistCardProps {
     artist: {
@@ -7,14 +7,17 @@ interface ArtistCardProps {
         name: string;
         picture_medium: string;
     };
+    onPress: () => void;
 }
 
-const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
+const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onPress }) => {
     return (
-        <View style={styles.artistContainer}>
-            <Image source={{ uri: artist.picture_medium }} style={styles.artistImage} />
-            <Text style={styles.artistName}>{artist.name}</Text>
-        </View>
+        <TouchableOpacity onPress={onPress}>
+            <View style={styles.artistContainer}>
+                <Image source={{ uri: artist.picture_medium }} style={styles.artistImage} />
+                <Text style={styles.artistName}>{artist.name}</Text>
+            </View>
+        </TouchableOpacity>
     );
 };
 
