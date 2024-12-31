@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Image, Text, Alert, Linking } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Image, Text, Alert, Linking, SafeAreaView } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { Audio, AVPlaybackStatus } from 'expo-av';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -90,7 +90,7 @@ export default function Player() {
     }
 
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Image
                 source={{ uri: track.album.cover_big }}
                 style={styles.coverArt}
@@ -120,7 +120,7 @@ export default function Player() {
 
                 <Icon style={{ marginRight: width * 0.05 }} name="forward" size={30} color="white" />
             </View>
-        </View>
+        </SafeAreaView>
     );
 }
 
