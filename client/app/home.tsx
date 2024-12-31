@@ -3,19 +3,22 @@ import { Text, View, StyleSheet, SafeAreaView, ScrollView, Alert, TouchableOpaci
 import * as SystemUI from 'expo-system-ui';
 import { Dimensions } from 'react-native';
 import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../state/store';
 import { increment } from '../state/slices/clickSlice';
+import { selectPlaylist } from '../state/slices/playlistSlice';
+import { selectArtist } from '../state/slices/artistSlice';
+import { selectSong } from '../state/slices/songSlice';
 import PlaylistCard from "@/components/PlaylistCard";
-import ArtistCard from '../components/ArtistCard';
-import SingleCard from '../components/SingleCard';
+import ArtistCard from "@/components/ArtistCard";
+import SingleCard from "@/components/SingleCard";
 
 const { height, width } = Dimensions.get('window');
 
 export default function Home() {
     interface CardData {
+        id: number;
         picture_medium: string;
         fans: number;
         title: string;
@@ -46,7 +49,7 @@ export default function Home() {
     const [artists, setArtists] = useState<ArtistData[]>([]);
     const [topSingles, setTopSingles] = useState<TrackData[]>([]);
     const [loading, setLoading] = useState(true); // Loading state
-    const navigation = useNavigation();
+    const router = useRouter();
     const dispatch = useDispatch();
     const clickCount = useSelector((state: RootState) => state.click.count);
 
@@ -130,10 +133,19 @@ export default function Home() {
         }
     };
 
-    const handleCardPress = () => {
-        dispatch(increment());
-        Alert.alert('Card Pressed', 'You pressed the card!');
-        // You can navigate to another screen or perform any other action here
+    const handleCardPress = (playlistId: number) => {
+        dispatch(selectPlaylist(playlistId));
+        router.push('/songList');
+    };
+
+    const handleArtistPress = (artistId: number) => {
+        dispatch(selectArtist(artistId));
+        router.push('/songList');
+    };
+
+    const handleSinglePress = (single: TrackData) => {
+        dispatch(selectSong(single.id));
+        router.push('/player');
     };
 
     const handleSeeMorePress = () => {
@@ -153,8 +165,8 @@ export default function Home() {
             <ScrollView contentContainerStyle={styles.scrollView}>
                 <Text style={styles.heading}>New Releases</Text>
                 <React.Fragment>
-                    <PlaylistCard data={firstCardData} onPress={handleCardPress} />
-                    <PlaylistCard data={secondCardData} onPress={handleCardPress} />
+                    <PlaylistCard data={firstCardData} onPress={() => firstCardData?.id && handleCardPress(firstCardData.id)} />
+                    <PlaylistCard data={secondCardData} onPress={() => secondCardData?.id && handleCardPress(secondCardData.id)} />
                     <View style={styles.seeMoreContainer}>
                         <TouchableOpacity onPress={handleSeeMorePress}>
                             <Text style={styles.seeMore}>See More {'>'}</Text>
@@ -165,14 +177,14 @@ export default function Home() {
                 <Text style={styles.heading}>Top Artists</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.artistsScrollView}>
                     {artists.map(artist => (
-                        <ArtistCard key={artist.id} artist={artist} onPress={handleCardPress} />
+                        <ArtistCard key={artist.id} artist={artist} onPress={() => handleArtistPress(artist.id)} />
                     ))}
                 </ScrollView>
 
                 <Text style={styles.heading}>On the Rise</Text>
                 <React.Fragment>
-                    <PlaylistCard data={thirdCardData} onPress={handleCardPress} />
-                    <PlaylistCard data={fourthCardData} onPress={handleCardPress} />
+                    <PlaylistCard data={thirdCardData} onPress={() => thirdCardData?.id && handleCardPress(thirdCardData.id)} />
+                    <PlaylistCard data={fourthCardData} onPress={() => fourthCardData?.id && handleCardPress(fourthCardData.id)} />
                     <View style={styles.seeMoreContainer}>
                         <TouchableOpacity onPress={handleSeeMorePress}>
                             <Text style={styles.seeMore}>See More {'>'}</Text>
@@ -183,7 +195,7 @@ export default function Home() {
                 <Text style={styles.heading}>Top Singles</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.singlesScrollView}>
                     {topSingles.map(single => (
-                        <SingleCard key={single.id} single={single} onPress={handleCardPress} />
+                        <SingleCard key={single.id} single={single} onPress={() => handleSinglePress(single)} />
                     ))}
                 </ScrollView>
             </ScrollView>

@@ -53,7 +53,12 @@ export default function RootLayout() {
 
           <Stack.Screen name="seeMore"
             options={{
-              headerTitle: "Music Player",
+              headerTitle: " ",
+              ...commonHeaderOptions,
+            }} />
+          <Stack.Screen name="songList"
+            options={{
+              headerTitle: " ",
               ...commonHeaderOptions,
             }} />
         </Stack>

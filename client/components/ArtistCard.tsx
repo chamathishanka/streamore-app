@@ -23,19 +23,18 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onPress }) => {
 
 const styles = StyleSheet.create({
     artistContainer: {
+        marginRight: 15,
         alignItems: 'center',
-        marginHorizontal: 10,
-        marginBottom: 20,
     },
     artistImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 40, // Make the image circular
-        marginBottom: 5,
+        width: 100,
+        height: 100,
+        borderRadius: 50,
     },
     artistName: {
-        color: "white",
+        color: 'white',
         fontSize: 14,
+        marginTop: 5,
         textAlign: 'center',
     },
 });
