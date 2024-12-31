@@ -252,6 +252,7 @@ const styles = StyleSheet.create({
     artistsScrollView: {
         paddingVertical: 10,
         paddingHorizontal: 5,
+        marginBottom: 20,
     },
     singlesScrollView: {
         paddingVertical: 10,
