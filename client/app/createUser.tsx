@@ -16,7 +16,7 @@ export default function CreateUser() {
         console.log('Name:', name);
         console.log('DOB:', dob);
         try {
-            const response = await axios.post('http://192.168.244.21:3000/api/users/create', {
+            const response = await axios.post('http://192.168.135.21:3000/api/users/create', {
                 username,
                 password,
                 name,

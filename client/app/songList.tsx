@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert } from "react-native";
 import axios from 'axios';
 import { Audio } from 'expo-av';
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,6 +9,7 @@ import { resetPlaylist } from '../state/slices/playlistSlice';
 import { setSongList, setCurrentSongIndex } from '../state/slices/songListSlice';
 import SongItem from "@/components/SongItem";
 import { useNavigation } from '@react-navigation/native';
+import FloatingButton from "@/components/FloatingButton";
 
 interface Song {
     id: number;
@@ -131,6 +132,7 @@ export default function SongList() {
                     />
                 )}
             />
+            <FloatingButton onPress={() => Alert.alert('Click Count', `Items clicked ${useSelector((state: RootState) => state.click.count)} times`)} />
         </View>
     );
 }

@@ -9,12 +9,11 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const router = useRouter();
 
-
     const handleLogin = async () => {
         console.log('Username:', username);
         console.log('Password:', password);
         try {
-            const response = await axios.post('http://192.168.244.21:3000/api/users/login', {
+            const response = await axios.post('http://192.168.135.21:3000/api/users/login', {
                 username,
                 password,
             });
@@ -34,7 +33,7 @@ export default function Login() {
             <Text style={styles.title}>Welcome Back</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Email or Phone Number"
+                placeholder="Username or Email"
                 placeholderTextColor="#888"
                 value={username}
                 onChangeText={setUsername}
@@ -51,10 +50,9 @@ export default function Login() {
                 <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
 
-
             <Text style={styles.prompt}>Don't have an account?</Text>
             <Link href="/createUser" asChild>
-                <TouchableOpacity >
+                <TouchableOpacity>
                     <Text style={styles.link}>Create a new user account</Text>
                 </TouchableOpacity>
             </Link>

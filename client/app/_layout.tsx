@@ -17,7 +17,7 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="index"
             options={{
-              headerTitle: "StreaMore",
+              headerTitle: " ",
               ...commonHeaderOptions,
               headerLeft: () => null,
             }} />

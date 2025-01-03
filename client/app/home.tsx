@@ -12,7 +12,10 @@ import { selectArtist } from '../state/slices/artistSlice';
 import { selectSong } from '../state/slices/songSlice';
 import PlaylistCard from "@/components/PlaylistCard";
 import ArtistCard from "@/components/ArtistCard";
+import SongItem from "@/components/SongItem";
+import SearchBar from "@/components/SearchBar";
 import SingleCard from "@/components/SingleCard";
+import FloatingButton from "@/components/FloatingButton";
 
 const { height, width } = Dimensions.get('window');
 
@@ -40,6 +43,7 @@ export default function Home() {
         album: {
             cover_medium: string;
         };
+        preview: string;
     }
 
     const [firstCardData, setFirstCardData] = useState<CardData | null>(null);
@@ -49,6 +53,8 @@ export default function Home() {
     const [artists, setArtists] = useState<ArtistData[]>([]);
     const [topSingles, setTopSingles] = useState<TrackData[]>([]);
     const [loading, setLoading] = useState(true); // Loading state
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [searchResults, setSearchResults] = useState<TrackData[]>([]);
     const router = useRouter();
     const dispatch = useDispatch();
     const clickCount = useSelector((state: RootState) => state.click.count);
@@ -135,21 +141,44 @@ export default function Home() {
 
     const handleCardPress = (playlistId: number) => {
         dispatch(selectPlaylist(playlistId));
+        dispatch(increment());
         router.push('/songList');
     };
 
     const handleArtistPress = (artistId: number) => {
         dispatch(selectArtist(artistId));
+        dispatch(increment());
         router.push('/songList');
     };
 
     const handleSinglePress = (single: TrackData) => {
         dispatch(selectSong(single.id));
+        dispatch(increment());
         router.push('/player');
     };
 
     const handleSeeMorePress = () => {
         router.push('/seeMore');
+    };
+
+    const handleSearch = async () => {
+        if (searchQuery.trim() === '') return;
+
+        setLoading(true);
+        try {
+            const response = await axios.get(`https://api.deezer.com/search?q=${searchQuery}`);
+            const songData = response.data.data;
+            setSearchResults(songData);
+        } catch (error) {
+            console.error('Error fetching search results:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePlayPause = async (song: TrackData) => {
+        dispatch(selectSong(song.id));
+        router.push('/player');
     };
 
     if (loading) {
@@ -162,46 +191,65 @@ export default function Home() {
 
     return (
         <SafeAreaView style={styles.container}>
+            <SearchBar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                onSubmit={handleSearch}
+            />
             <ScrollView contentContainerStyle={styles.scrollView}>
-                <Text style={styles.heading}>New Releases</Text>
-                <React.Fragment>
-                    <PlaylistCard data={firstCardData} onPress={() => firstCardData?.id && handleCardPress(firstCardData.id)} />
-                    <PlaylistCard data={secondCardData} onPress={() => secondCardData?.id && handleCardPress(secondCardData.id)} />
-                    <View style={styles.seeMoreContainer}>
-                        <TouchableOpacity onPress={handleSeeMorePress}>
-                            <Text style={styles.seeMore}>See More {'>'}</Text>
-                        </TouchableOpacity>
-                    </View>
-                </React.Fragment>
+                {searchResults.length > 0 ? (
+                    <>
+                        <Text style={styles.heading}>Search Results</Text>
+                        {searchResults.map(single => (
+                            <SongItem
+                                key={single.id}
+                                song={single}
+                                isPlaying={false}
+                                onPlayPause={() => handlePlayPause(single)}
+                            />
+                        ))}
+                    </>
+                ) : (
+                    <>
+                        <Text style={styles.heading}>New Releases</Text>
+                        <React.Fragment>
+                            <PlaylistCard data={firstCardData} onPress={() => firstCardData?.id && handleCardPress(firstCardData.id)} />
+                            <PlaylistCard data={secondCardData} onPress={() => secondCardData?.id && handleCardPress(secondCardData.id)} />
+                            <View style={styles.seeMoreContainer}>
+                                <TouchableOpacity onPress={handleSeeMorePress}>
+                                    <Text style={styles.seeMore}>See More {'>'}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </React.Fragment>
 
-                <Text style={styles.heading}>Top Artists</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.artistsScrollView}>
-                    {artists.map(artist => (
-                        <ArtistCard key={artist.id} artist={artist} onPress={() => handleArtistPress(artist.id)} />
-                    ))}
-                </ScrollView>
+                        <Text style={styles.heading}>Top Artists</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.artistsScrollView}>
+                            {artists.map(artist => (
+                                <ArtistCard key={artist.id} artist={artist} onPress={() => handleArtistPress(artist.id)} />
+                            ))}
+                        </ScrollView>
 
-                <Text style={styles.heading}>On the Rise</Text>
-                <React.Fragment>
-                    <PlaylistCard data={thirdCardData} onPress={() => thirdCardData?.id && handleCardPress(thirdCardData.id)} />
-                    <PlaylistCard data={fourthCardData} onPress={() => fourthCardData?.id && handleCardPress(fourthCardData.id)} />
-                    <View style={styles.seeMoreContainer}>
-                        <TouchableOpacity onPress={handleSeeMorePress}>
-                            <Text style={styles.seeMore}>See More {'>'}</Text>
-                        </TouchableOpacity>
-                    </View>
-                </React.Fragment>
+                        <Text style={styles.heading}>On the Rise</Text>
+                        <React.Fragment>
+                            <PlaylistCard data={thirdCardData} onPress={() => thirdCardData?.id && handleCardPress(thirdCardData.id)} />
+                            <PlaylistCard data={fourthCardData} onPress={() => fourthCardData?.id && handleCardPress(fourthCardData.id)} />
+                            <View style={styles.seeMoreContainer}>
+                                <TouchableOpacity onPress={handleSeeMorePress}>
+                                    <Text style={styles.seeMore}>See More {'>'}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </React.Fragment>
 
-                <Text style={styles.heading}>Top Singles</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.singlesScrollView}>
-                    {topSingles.map(single => (
-                        <SingleCard key={single.id} single={single} onPress={() => handleSinglePress(single)} />
-                    ))}
-                </ScrollView>
+                        <Text style={styles.heading}>Top Singles</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.singlesScrollView}>
+                            {topSingles.map(single => (
+                                <SingleCard key={single.id} single={single} onPress={() => handleSinglePress(single)} />
+                            ))}
+                        </ScrollView>
+                    </>
+                )}
             </ScrollView>
-            <TouchableOpacity style={styles.floatingButton} onPress={() => Alert.alert('Click Count', `Items clicked ${clickCount} times`)}>
-                <Text style={styles.floatingButtonText}>{clickCount}</Text>
-            </TouchableOpacity>
+            <FloatingButton onPress={() => Alert.alert('Click Count', `Items clicked ${clickCount} times`)} />
         </SafeAreaView>
     );
 }
@@ -257,21 +305,5 @@ const styles = StyleSheet.create({
     singlesScrollView: {
         paddingVertical: 10,
         paddingHorizontal: 5,
-    },
-    floatingButton: {
-        position: 'absolute',
-        bottom: 30,
-        right: 30,
-        backgroundColor: '#8df807',
-        borderRadius: 50,
-        width: 60,
-        height: 60,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    floatingButtonText: {
-        color: 'black',
-        fontSize: 18,
-        fontWeight: 'bold',
     },
 });
