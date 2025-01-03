@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, Alert } from "react-native";
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from "react-native";
 import axios from 'axios';
 import { Audio } from 'expo-av';
 import { useDispatch, useSelector } from 'react-redux';
@@ -110,6 +110,11 @@ export default function SongList() {
         }
     };
 
+    const handleFloatingButtonPress = () => {
+        // Define the action for the floating button press
+        console.log('Floating button pressed');
+    };
+
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
@@ -132,7 +137,7 @@ export default function SongList() {
                     />
                 )}
             />
-            <FloatingButton onPress={() => Alert.alert('Click Count', `Items clicked ${useSelector((state: RootState) => state.click.count)} times`)} />
+            <FloatingButton onPress={handleFloatingButtonPress} />
         </View>
     );
 }
