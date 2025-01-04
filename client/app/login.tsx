@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Text, View, StyleSheet, TextInput, TouchableOpacity, SafeAreaView } from "react-native";
 import axios from 'axios';
 import { Link, useRouter } from "expo-router";
+import { useDispatch } from 'react-redux';
+import { setUsername } from '../state/slices/userSlice';
 
 export default function Login() {
     const [identifier, setIdentifier] = useState('');
@@ -9,6 +11,7 @@ export default function Login() {
     const [identifierError, setIdentifierError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const router = useRouter();
+    const dispatch = useDispatch();
 
     const handleLogin = async () => {
         setIdentifierError('');
@@ -30,6 +33,7 @@ export default function Login() {
                 password,
             });
             if (response.status === 200) {
+                dispatch(setUsername(identifier));
                 router.push('/home');
             } else {
                 setIdentifierError('Invalid username or email');

@@ -58,6 +58,7 @@ export default function Home() {
     const router = useRouter();
     const dispatch = useDispatch();
     const clickCount = useSelector((state: RootState) => state.click.count);
+    const username = useSelector((state: RootState) => state.user.username);
 
     useEffect(() => {
         SystemUI.setBackgroundColorAsync('#0a0a1a');
@@ -191,11 +192,12 @@ export default function Home() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <SearchBar
+            {username && <Text style={styles.welcomeText}>Hi, {username}</Text>}
+            {/* <SearchBar
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 onSubmit={handleSearch}
-            />
+            /> */}
             <ScrollView contentContainerStyle={styles.scrollView}>
                 {searchResults.length > 0 ? (
                     <>
@@ -267,6 +269,11 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "#0a0a1a",
+    },
+    welcomeText: {
+        color: "white",
+        fontSize: 18,
+        marginBottom: 10,
     },
     heading: {
         color: "white",
