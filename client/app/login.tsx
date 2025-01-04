@@ -28,7 +28,7 @@ export default function Login() {
         }
 
         try {
-            const response = await axios.post('http://192.168.135.21:3000/api/users/login', {
+            const response = await axios.post('http://localhost:3000/api/users/login', {
                 identifier,
                 password,
             });
