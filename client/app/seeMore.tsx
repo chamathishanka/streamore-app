@@ -1,38 +1,96 @@
-import React, { useEffect } from "react";
-import { Text, View, StyleSheet, SafeAreaView, Image, TouchableOpacity, Alert, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Text, View, StyleSheet, SafeAreaView, Alert, ScrollView, ActivityIndicator } from "react-native";
 import * as SystemUI from 'expo-system-ui';
 import { Dimensions } from 'react-native';
+import axios from 'axios';
+import { useRouter } from "expo-router";
+import { useDispatch } from 'react-redux';
+import { selectPlaylist } from '../state/slices/playlistSlice';
+import PlaylistCard from "@/components/PlaylistCard";
 
 const { height, width } = Dimensions.get('window');
 
+interface CardData {
+    id: number;
+    title: string;
+    description: string;
+    picture_medium: string;
+    fans: number;
+}
+
 export default function SeeMore() {
+    const [cards, setCards] = useState<CardData[]>([]);
+    const [loading, setLoading] = useState(true);
+    const router = useRouter();
+    const dispatch = useDispatch();
+
     useEffect(() => {
         SystemUI.setBackgroundColorAsync('#0a0a1a');
+        fetchCardData();
     }, []);
 
-    const handleCardPress = () => {
-        Alert.alert('Card Pressed', 'You pressed the card!');
-        // You can navigate to another screen or perform any other action here
+    const fetchCardData = async () => {
+        const apiNumbers = [
+            '1996494362',
+            '2532117644',
+            '12673058961',
+            '11081408402',
+            '1495242491',
+            '10581717182',
+            '715215865',
+            '1908130662',
+
+
+        ];
+
+        const urls = apiNumbers.map(number => `https://api.deezer.com/playlist/${number}`);
+
+        try {
+            const fetchData = async (url: string) => {
+                const response = await axios.get(url);
+                return response.data;
+            };
+
+            const results = await Promise.all(urls.map(fetchData));
+            const cardData = results.map(data => ({
+                id: data.id,
+                title: data.title,
+                picture_medium: data.picture_medium,
+                fans: data.fans,
+                description: data.description,
+            }));
+            setCards(cardData);
+        } catch (error) {
+            console.error('Error fetching card data:', error);
+            Alert.alert('Error', 'Error fetching card data');
+        } finally {
+            setLoading(false);
+        }
     };
+
+    const handleCardPress = (playlistId: number) => {
+        dispatch(selectPlaylist(playlistId));
+        router.push('/songList');
+    };
+
+    if (loading) {
+        return (
+            <SafeAreaView style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#8df807" />
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.heading}>New Releases</Text>
+            <Text style={styles.heading}>Popular Playlists</Text>
             <ScrollView contentContainerStyle={styles.scrollView}>
-                {[...Array(10)].map((_, index) => (
-                    <TouchableOpacity key={index} style={styles.card} onPress={handleCardPress}>
-                        <View style={styles.cardStatus}>
-                            <Text style={styles.cardStatusText}>Status</Text>
-                        </View>
-                        <Image
-                            source={{ uri: 'https://via.placeholder.com/150' }}
-                            style={styles.cardImage}
-                        />
-                        <View style={styles.cardContent}>
-                            <Text style={styles.cardTitle}>Card Title {index + 1}</Text>
-                            <Text style={styles.cardDescription}>This is a description of the card. It provides more details about the content.</Text>
-                        </View>
-                    </TouchableOpacity>
+                {cards.map((card) => (
+                    <PlaylistCard
+                        key={card.id}
+                        data={card}
+                        onPress={() => handleCardPress(card.id)}
+                    />
                 ))}
             </ScrollView>
         </SafeAreaView>
@@ -47,6 +105,12 @@ const styles = StyleSheet.create({
         backgroundColor: "#0a0a1a",
         padding: 20,
     },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#0a0a1a",
+    },
     heading: {
         color: "white",
         fontSize: 24,
@@ -55,50 +119,5 @@ const styles = StyleSheet.create({
     },
     scrollView: {
         alignItems: "center",
-    },
-    card: {
-        width: width * 0.90, // Adjust the width as needed
-        height: 120, // Adjust the height as needed
-        backgroundColor: "#2e2e2e", // Greyish background color
-        borderRadius: 8,
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 20,
-        position: 'relative', // Add relative positioning to the card
-    },
-    cardImage: {
-        width: 120,
-        height: 120,
-        borderRadius: 5,
-        margin: 0,
-        marginRight: 10,
-    },
-    cardContent: {
-        flex: 1,
-    },
-    cardTitle: {
-        color: "white", // White text color for the title
-        fontSize: 16,
-        fontWeight: "bold",
-        marginHorizontal: 10,
-    },
-    cardDescription: {
-        color: "#888", // Grey text color for the description
-        fontSize: 14,
-        marginHorizontal: 10,
-    },
-    cardStatus: {
-        backgroundColor: "#8df807",
-        borderRadius: 8,
-        padding: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'absolute', // Position the status tag absolutely
-        top: 10, // Adjust the top position as needed
-        right: 10, // Adjust the right position as needed
-    },
-    cardStatusText: {
-        color: "black",
-        fontSize: 12,
     },
 });

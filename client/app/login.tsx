@@ -1,31 +1,47 @@
-import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, TextInput, TouchableOpacity, Alert, SafeAreaView } from "react-native";
-import * as SystemUI from 'expo-system-ui';
+import React, { useState } from "react";
+import { Text, View, StyleSheet, TextInput, TouchableOpacity, SafeAreaView } from "react-native";
 import axios from 'axios';
 import { Link, useRouter } from "expo-router";
+import { useDispatch } from 'react-redux';
+import { setUsername } from '../state/slices/userSlice';
 
 export default function Login() {
-    const [username, setUsername] = useState('');
+    const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
+    const [identifierError, setIdentifierError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
     const router = useRouter();
-
+    const dispatch = useDispatch();
 
     const handleLogin = async () => {
-        console.log('Username:', username);
-        console.log('Password:', password);
+        setIdentifierError('');
+        setPasswordError('');
+
+        if (!identifier) {
+            setIdentifierError('Please enter your username or email');
+        }
+        if (!password) {
+            setPasswordError('Please enter your password');
+        }
+        if (!identifier || !password) {
+            return;
+        }
+
         try {
-            const response = await axios.post('http://192.168.244.21:3000/api/users/login', {
-                username,
+            const response = await axios.post('http://192.168.135.21:3000/api/users/login', {
+                identifier,
                 password,
             });
             if (response.status === 200) {
-                Alert.alert('Success', 'Login successful');
+                dispatch(setUsername(identifier));
                 router.push('/home');
             } else {
-                Alert.alert('Error', 'Invalid username or password');
+                setIdentifierError('Invalid username or email');
+                setPasswordError('Invalid password');
             }
         } catch (error) {
-            Alert.alert('Error', 'Error logging in: ' + (error as any).message);
+            setIdentifierError('Invalid username or email');
+            setPasswordError('Invalid password');
         }
     };
 
@@ -34,11 +50,12 @@ export default function Login() {
             <Text style={styles.title}>Welcome Back</Text>
             <TextInput
                 style={styles.input}
-                placeholder="Email or Phone Number"
+                placeholder="Username or Email"
                 placeholderTextColor="#888"
-                value={username}
-                onChangeText={setUsername}
+                value={identifier}
+                onChangeText={setIdentifier}
             />
+            {identifierError ? <Text style={styles.errorText}>{identifierError}</Text> : null}
             <TextInput
                 style={styles.input}
                 placeholder="Password"
@@ -47,14 +64,14 @@ export default function Login() {
                 value={password}
                 onChangeText={setPassword}
             />
+            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
                 <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
 
-
             <Text style={styles.prompt}>Don't have an account?</Text>
             <Link href="/createUser" asChild>
-                <TouchableOpacity >
+                <TouchableOpacity>
                     <Text style={styles.link}>Create a new user account</Text>
                 </TouchableOpacity>
             </Link>
@@ -84,10 +101,15 @@ const styles = StyleSheet.create({
         color: "white",
         borderRadius: 8,
     },
+    errorText: {
+        color: "red",
+        marginBottom: 10,
+        alignSelf: "flex-start",
+    },
     button: {
         width: "100%",
         padding: 15,
-        backgroundColor: "#046ebf",
+        backgroundColor: "#8df807",
         borderRadius: 8,
         alignItems: "center",
         marginTop: 20,

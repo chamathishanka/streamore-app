@@ -5,10 +5,13 @@ import { Audio, AVPlaybackStatus } from 'expo-av';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Dimensions } from 'react-native';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { RootState } from '../state/store';
 
 const { height, width } = Dimensions.get('window');
 
 export default function Player() {
+    const selectedSongId = useSelector((state: RootState) => state.song.selectedSongId);
     const [sound, setSound] = useState<Audio.Sound | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [position, setPosition] = useState(0);
@@ -17,17 +20,19 @@ export default function Player() {
 
     useEffect(() => {
         const fetchTrack = async () => {
-            try {
-                const response = await axios.get('https://api.deezer.com/track/2992749261');
-                setTrack(response.data);
-            } catch (error) {
-                console.error('Error fetching track:', error);
-                Alert.alert('Error', 'Error fetching track data');
+            if (selectedSongId) {
+                try {
+                    const response = await axios.get(`https://api.deezer.com/track/${selectedSongId}`);
+                    setTrack(response.data);
+                } catch (error) {
+                    console.error('Error fetching track:', error);
+                    Alert.alert('Error', 'Error fetching track data');
+                }
             }
         };
 
         fetchTrack();
-    }, []);
+    }, [selectedSongId]);
 
     useEffect(() => {
         if (track && track.preview) {
@@ -141,13 +146,13 @@ const styles = StyleSheet.create({
     textContainer: {
         width: '100%',
         alignItems: 'flex-start', // Align text to the left
-        marginLeft: width * 0.07,
+        marginHorizontal: width * 0.07,
         marginBottom: 15,
     },
     songName: {
         fontSize: 24,
         color: 'white',
-        textAlign: 'right',
+        textAlign: 'left',
         marginBottom: 5,
         fontWeight: 'bold',
     },

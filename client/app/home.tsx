@@ -3,16 +3,25 @@ import { Text, View, StyleSheet, SafeAreaView, ScrollView, Alert, TouchableOpaci
 import * as SystemUI from 'expo-system-ui';
 import { Dimensions } from 'react-native';
 import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../state/store';
+import { increment } from '../state/slices/clickSlice';
+import { selectPlaylist } from '../state/slices/playlistSlice';
+import { selectArtist } from '../state/slices/artistSlice';
+import { selectSong } from '../state/slices/songSlice';
 import PlaylistCard from "@/components/PlaylistCard";
-import ArtistCard from '../components/ArtistCard';
-import SingleCard from '../components/SingleCard';
+import ArtistCard from "@/components/ArtistCard";
+import SongItem from "@/components/SongItem";
+import SearchBar from "@/components/SearchBar";
+import SingleCard from "@/components/SingleCard";
+import FloatingButton from "@/components/FloatingButton";
 
 const { height, width } = Dimensions.get('window');
 
 export default function Home() {
     interface CardData {
+        id: number;
         picture_medium: string;
         fans: number;
         title: string;
@@ -34,6 +43,7 @@ export default function Home() {
         album: {
             cover_medium: string;
         };
+        preview: string;
     }
 
     const [firstCardData, setFirstCardData] = useState<CardData | null>(null);
@@ -43,7 +53,12 @@ export default function Home() {
     const [artists, setArtists] = useState<ArtistData[]>([]);
     const [topSingles, setTopSingles] = useState<TrackData[]>([]);
     const [loading, setLoading] = useState(true); // Loading state
-    const navigation = useNavigation();
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [searchResults, setSearchResults] = useState<TrackData[]>([]);
+    const router = useRouter();
+    const dispatch = useDispatch();
+    const clickCount = useSelector((state: RootState) => state.click.count);
+    const username = useSelector((state: RootState) => state.user.username);
 
     useEffect(() => {
         SystemUI.setBackgroundColorAsync('#0a0a1a');
@@ -125,13 +140,46 @@ export default function Home() {
         }
     };
 
-    const handleCardPress = () => {
-        Alert.alert('Card Pressed', 'You pressed the card!');
-        // You can navigate to another screen or perform any other action here
+    const handleCardPress = (playlistId: number) => {
+        dispatch(selectPlaylist(playlistId));
+        dispatch(increment());
+        router.push('/songList');
+    };
+
+    const handleArtistPress = (artistId: number) => {
+        dispatch(selectArtist(artistId));
+        dispatch(increment());
+        router.push('/songList');
+    };
+
+    const handleSinglePress = (single: TrackData) => {
+        dispatch(selectSong(single.id));
+        dispatch(increment());
+        router.push('/player');
     };
 
     const handleSeeMorePress = () => {
         router.push('/seeMore');
+    };
+
+    const handleSearch = async () => {
+        if (searchQuery.trim() === '') return;
+
+        setLoading(true);
+        try {
+            const response = await axios.get(`https://api.deezer.com/search?q=${searchQuery}`);
+            const songData = response.data.data;
+            setSearchResults(songData);
+        } catch (error) {
+            console.error('Error fetching search results:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePlayPause = async (song: TrackData) => {
+        dispatch(selectSong(song.id));
+        router.push('/player');
     };
 
     if (loading) {
@@ -144,43 +192,66 @@ export default function Home() {
 
     return (
         <SafeAreaView style={styles.container}>
+            {username && <Text style={styles.welcomeText}>Hi, {username}</Text>}
+            {/* <SearchBar
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                onSubmit={handleSearch}
+            /> */}
             <ScrollView contentContainerStyle={styles.scrollView}>
-                <Text style={styles.heading}>New Releases</Text>
-                <React.Fragment>
-                    <PlaylistCard data={firstCardData} onPress={handleCardPress} />
-                    <PlaylistCard data={secondCardData} onPress={handleCardPress} />
-                    <View style={styles.seeMoreContainer}>
-                        <TouchableOpacity onPress={handleSeeMorePress}>
-                            <Text style={styles.seeMore}>See More {'>'}</Text>
-                        </TouchableOpacity>
-                    </View>
-                </React.Fragment>
+                {searchResults.length > 0 ? (
+                    <>
+                        <Text style={styles.heading}>Search Results</Text>
+                        {searchResults.map(single => (
+                            <SongItem
+                                key={single.id}
+                                song={single}
+                                isPlaying={false}
+                                onPlayPause={() => handlePlayPause(single)}
+                            />
+                        ))}
+                    </>
+                ) : (
+                    <>
+                        <Text style={styles.heading}>New Releases</Text>
+                        <React.Fragment>
+                            <PlaylistCard data={firstCardData} onPress={() => firstCardData?.id && handleCardPress(firstCardData.id)} />
+                            <PlaylistCard data={secondCardData} onPress={() => secondCardData?.id && handleCardPress(secondCardData.id)} />
+                            <View style={styles.seeMoreContainer}>
+                                <TouchableOpacity onPress={handleSeeMorePress}>
+                                    <Text style={styles.seeMore}>See More {'>'}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </React.Fragment>
 
-                <Text style={styles.heading}>Top Artists</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.artistsScrollView}>
-                    {artists.map(artist => (
-                        <ArtistCard key={artist.id} artist={artist} />
-                    ))}
-                </ScrollView>
+                        <Text style={styles.heading}>Top Artists</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.artistsScrollView}>
+                            {artists.map(artist => (
+                                <ArtistCard key={artist.id} artist={artist} onPress={() => handleArtistPress(artist.id)} />
+                            ))}
+                        </ScrollView>
 
-                <Text style={styles.heading}>On the Rise</Text>
-                <React.Fragment>
-                    <PlaylistCard data={thirdCardData} onPress={handleCardPress} />
-                    <PlaylistCard data={fourthCardData} onPress={handleCardPress} />
-                    <View style={styles.seeMoreContainer}>
-                        <TouchableOpacity onPress={handleSeeMorePress}>
-                            <Text style={styles.seeMore}>See More {'>'}</Text>
-                        </TouchableOpacity>
-                    </View>
-                </React.Fragment>
+                        <Text style={styles.heading}>On the Rise</Text>
+                        <React.Fragment>
+                            <PlaylistCard data={thirdCardData} onPress={() => thirdCardData?.id && handleCardPress(thirdCardData.id)} />
+                            <PlaylistCard data={fourthCardData} onPress={() => fourthCardData?.id && handleCardPress(fourthCardData.id)} />
+                            <View style={styles.seeMoreContainer}>
+                                <TouchableOpacity onPress={handleSeeMorePress}>
+                                    <Text style={styles.seeMore}>See More {'>'}</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </React.Fragment>
 
-                <Text style={styles.heading}>Top Singles</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.singlesScrollView}>
-                    {topSingles.map(single => (
-                        <SingleCard key={single.id} single={single} />
-                    ))}
-                </ScrollView>
+                        <Text style={styles.heading}>Top Singles</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.singlesScrollView}>
+                            {topSingles.map(single => (
+                                <SingleCard key={single.id} single={single} onPress={() => handleSinglePress(single)} />
+                            ))}
+                        </ScrollView>
+                    </>
+                )}
             </ScrollView>
+            <FloatingButton onPress={() => Alert.alert('Click Count', `Items clicked ${clickCount} times`)} />
         </SafeAreaView>
     );
 }
@@ -198,6 +269,11 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "#0a0a1a",
+    },
+    welcomeText: {
+        color: "white",
+        fontSize: 18,
+        marginBottom: 10,
     },
     heading: {
         color: "white",
@@ -231,6 +307,7 @@ const styles = StyleSheet.create({
     artistsScrollView: {
         paddingVertical: 10,
         paddingHorizontal: 5,
+        marginBottom: 20,
     },
     singlesScrollView: {
         paddingVertical: 10,

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 
 interface SingleCardProps {
     single: {
@@ -12,15 +12,18 @@ interface SingleCardProps {
             cover_medium: string;
         };
     };
+    onPress: () => void;
 }
 
-const SingleCard: React.FC<SingleCardProps> = ({ single }) => {
+const SingleCard: React.FC<SingleCardProps> = ({ single, onPress }) => {
     return (
-        <View style={styles.singleContainer}>
-            <Image source={{ uri: single.album.cover_medium }} style={styles.singleImage} />
-            <Text style={styles.singleTitle}>{single.title}</Text>
-            <Text style={styles.singleArtist}>{single.artist.name}</Text>
-        </View>
+        <TouchableOpacity onPress={onPress}>
+            <View style={styles.singleContainer}>
+                <Image source={{ uri: single.album.cover_medium }} style={styles.singleImage} />
+                <Text style={styles.singleTitle}>{single.title}</Text>
+                <Text style={styles.singleArtist}>{single.artist.name}</Text>
+            </View>
+        </TouchableOpacity>
     );
 };
 

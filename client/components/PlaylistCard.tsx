@@ -20,7 +20,7 @@ const PlaylistCard: React.FC<PlaylistCardProps> = ({ data, onPress }) => {
     return (
         <TouchableOpacity style={styles.card} onPress={onPress}>
             <View style={styles.cardStatus}>
-                <Text style={styles.cardStatusText}>{`${(data.fans / 1000).toFixed(1)}K`}</Text>
+                <Text style={styles.cardStatusText}>{data.fans > 1000 ? `${(data.fans / 1000).toFixed(1)}K` : data.fans}</Text>
                 <Icon name="heart" size={12} color="black" />
             </View>
             <Image
