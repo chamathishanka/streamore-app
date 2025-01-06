@@ -110,11 +110,6 @@ export default function SongList() {
         }
     };
 
-    const handleFloatingButtonPress = () => {
-        // Define the action for the floating button press
-        console.log('Floating button pressed');
-    };
-
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
@@ -137,7 +132,7 @@ export default function SongList() {
                     />
                 )}
             />
-            <FloatingButton onPress={handleFloatingButtonPress} />
+            <FloatingButton />
         </View>
     );
 }

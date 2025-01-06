@@ -57,7 +57,6 @@ export default function Home() {
     const [searchResults, setSearchResults] = useState<TrackData[]>([]);
     const router = useRouter();
     const dispatch = useDispatch();
-    const clickCount = useSelector((state: RootState) => state.click.count);
     const username = useSelector((state: RootState) => state.user.username);
 
     useEffect(() => {
@@ -142,19 +141,16 @@ export default function Home() {
 
     const handleCardPress = (playlistId: number) => {
         dispatch(selectPlaylist(playlistId));
-        dispatch(increment());
         router.push('/songList');
     };
 
     const handleArtistPress = (artistId: number) => {
         dispatch(selectArtist(artistId));
-        dispatch(increment());
         router.push('/songList');
     };
 
     const handleSinglePress = (single: TrackData) => {
         dispatch(selectSong(single.id));
-        dispatch(increment());
         router.push('/player');
     };
 
@@ -192,12 +188,6 @@ export default function Home() {
 
     return (
         <SafeAreaView style={styles.container}>
-            {username && <Text style={styles.welcomeText}>Hi, {username}</Text>}
-            {/* <SearchBar
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                onSubmit={handleSearch}
-            /> */}
             <ScrollView contentContainerStyle={styles.scrollView}>
                 {searchResults.length > 0 ? (
                     <>
@@ -251,7 +241,7 @@ export default function Home() {
                     </>
                 )}
             </ScrollView>
-            <FloatingButton onPress={() => Alert.alert('Click Count', `Items clicked ${clickCount} times`)} />
+            <FloatingButton />
         </SafeAreaView>
     );
 }
@@ -269,11 +259,6 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         backgroundColor: "#0a0a1a",
-    },
-    welcomeText: {
-        color: "white",
-        fontSize: 18,
-        marginBottom: 10,
     },
     heading: {
         color: "white",

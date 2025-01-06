@@ -61,6 +61,12 @@ export default function RootLayout() {
               headerTitle: " ",
               ...commonHeaderOptions,
             }} />
+
+          <Stack.Screen name="searchList"
+            options={{
+              headerTitle: "Search",
+              ...commonHeaderOptions,
+            }} />
         </Stack>
       </>
     </Provider>

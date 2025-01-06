@@ -1,19 +1,15 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
-import { useSelector } from 'react-redux';
-import { RootState } from '../state/store';
+import { TouchableOpacity, StyleSheet } from 'react-native';
+import { Link } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 
-interface FloatingButtonProps {
-    onPress: () => void;
-}
-
-const FloatingButton: React.FC<FloatingButtonProps> = ({ onPress }) => {
-    const clickCount = useSelector((state: RootState) => state.click.count);
-
+const FloatingButton: React.FC = () => {
     return (
-        <TouchableOpacity style={styles.floatingButton} onPress={onPress}>
-            <Text style={styles.floatingButtonText}>{clickCount}</Text>
-        </TouchableOpacity>
+        <Link href="/searchList" asChild>
+            <TouchableOpacity style={styles.floatingButton}>
+                <Ionicons name="search" size={24} color="black" />
+            </TouchableOpacity>
+        </Link>
     );
 };
 
@@ -28,11 +24,6 @@ const styles = StyleSheet.create({
         height: 60,
         justifyContent: 'center',
         alignItems: 'center',
-    },
-    floatingButtonText: {
-        color: 'black',
-        fontSize: 18,
-        fontWeight: 'bold',
     },
 });
 
