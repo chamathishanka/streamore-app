@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
     },
     cardStatus: {
-        backgroundColor: "#8df807",
+        backgroundColor: "#1DB954",
         borderRadius: 8,
         padding: 5,
         justifyContent: 'center',

@@ -181,7 +181,7 @@ export default function Home() {
     if (loading) {
         return (
             <SafeAreaView style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#8df807" />
+                <ActivityIndicator size="large" color="#1DB954" />
             </SafeAreaView>
         );
     }
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
         paddingRight: 10,
     },
     seeMore: {
-        color: "#8df807",
+        color: "#1DB954",
         fontSize: 16,
         marginBottom: 10,
     },

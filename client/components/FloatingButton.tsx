@@ -7,7 +7,7 @@ const FloatingButton: React.FC = () => {
     return (
         <Link href="/searchList" asChild>
             <TouchableOpacity style={styles.floatingButton}>
-                <Ionicons name="search" size={24} color="black" />
+                <Ionicons name="search" size={24} color="white" />
             </TouchableOpacity>
         </Link>
     );
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 30,
         right: 30,
-        backgroundColor: '#8df807',
+        backgroundColor: '#1DB954',
         borderRadius: 50,
         width: 60,
         height: 60,

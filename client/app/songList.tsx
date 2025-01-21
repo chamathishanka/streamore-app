@@ -113,7 +113,7 @@ export default function SongList() {
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#8df807" />
+                <ActivityIndicator size="large" color="#e61014" />
             </View>
         );
     }

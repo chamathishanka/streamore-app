@@ -82,6 +82,6 @@ const styles = StyleSheet.create({
     color: "white",
   },
   more: {
-    color: "#8df807",
+    color: "#1DB954",
   },
 });
